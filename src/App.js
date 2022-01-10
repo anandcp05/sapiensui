@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const base_url = "https://sapienstest.herokuapp.com/"
+const base_url = "https://sapienstest.herokuapp.com"
 export default function App() {
   const classes = useStyles();
   const [themes, setThemes] = useState([]);
