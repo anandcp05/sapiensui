@@ -13,11 +13,27 @@ import {
 import { Menu as MenuIcon, Add as AddIcon } from "@material-ui/icons";
 import {
   makeStyles,
-  createMuiTheme,
+  createTheme,
   MuiThemeProvider
 } from "@material-ui/core/styles";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { purple, green } from "@material-ui/core/colors";
+import CssBaseline from "@material-ui/core/CssBaseline";
+
+
+
+const themeSecondary = createTheme({
+  palette: {
+    primary: purple,
+    secondary: green
+  },
+  spacing: 8
+});
+
+const themePrimary = createTheme({
+  spacing: 8
+});
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,7 +59,7 @@ const base_url = "https://sapienstest.herokuapp.com"
 export default function App() {
   const classes = useStyles();
   const [themes, setThemes] = useState([]);
-  const [theme, setTheme] = useState("");
+  const [theme, setTheme] = useState(1);
 
 
   useEffect(async () => {
@@ -69,30 +85,33 @@ export default function App() {
   };
 
   return (
-    <div className="App">
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-label="menu"
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            Sapiens
-          </Typography>
-          <FormControl className={classes.theme} variant="standard">
-            <InputLabel>Theme</InputLabel>
-            <Select value={theme} label="Theme" onChange={handleChange}>
-              {themes.map((theme) => {
-                return <MenuItem key={theme.id} value={theme.id}>{theme.type}</MenuItem>
-              })}
-            </Select>
-          </FormControl>
-        </Toolbar>
-      </AppBar>
-    </div>
+    <MuiThemeProvider theme={theme == 1 ? themePrimary : themeSecondary}>
+      <CssBaseline />
+      <div className="App">
+        <AppBar position="static">
+          <Toolbar>
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="menu"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" className={classes.title}>
+              Sapiens
+            </Typography>
+            <FormControl className={classes.theme} variant="standard">
+              <InputLabel>Theme</InputLabel>
+              <Select value={theme} label="Theme" onChange={handleChange}>
+                {themes.map((theme) => {
+                  return <MenuItem key={theme.id} value={theme.id}>{theme.type}</MenuItem>
+                })}
+              </Select>
+            </FormControl>
+          </Toolbar>
+        </AppBar>
+      </div>
+    </MuiThemeProvider>
   );
 }
