@@ -20,20 +20,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { purple, green } from "@material-ui/core/colors";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import StatusCard from "./components/statusCard";
+import Switch from "@material-ui/core/Switch";
+import Header from "./components/header"
 
 
-
-const themeSecondary = createTheme({
-  palette: {
-    primary: purple,
-    secondary: green
-  },
-  spacing: 8
-});
-
-const themePrimary = createTheme({
-  spacing: 8
-});
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,7 +51,19 @@ export default function App() {
   const classes = useStyles();
   const [themes, setThemes] = useState([]);
   const [theme, setTheme] = useState(1);
-
+  const [isLoading, setIsLoading] = useState(true)
+  const [toggleDark, settoggleDark] = useState(false);
+  //callAPI()
+  const themeSecondary = createTheme({
+    palette: toggleDark ? {
+      primary: purple,
+      secondary: green,
+      type: "dark",
+    } : {
+      type: "light",
+    },
+    spacing: 8
+  });
 
   useEffect(async () => {
     const themes = await axios.get(
@@ -71,7 +74,20 @@ export default function App() {
       `${base_url}/user/theme/1`
     );
     setTheme(selectedTheme.data.theme.theme_id);
+    settoggleDark(selectedTheme.data.theme.theme_id == 1 ? false : true);
+    setIsLoading(false)
   }, []);
+
+  const setToggleDark = async () => {
+    settoggleDark(!toggleDark);
+    const selectedTheme = await axios.put(
+      `${base_url}/user/theme/1`,
+      {
+        "themeId": toggleDark ? 1 : 2
+      }
+    );
+    console.log(selectedTheme)
+  }
 
   const handleChange = async (event) => {
     setTheme(event.target.value);
@@ -85,32 +101,19 @@ export default function App() {
   };
 
   return (
-    <MuiThemeProvider theme={theme == 1 ? themePrimary : themeSecondary}>
+    <MuiThemeProvider theme={themeSecondary}>
       <CssBaseline />
       <div className="App">
-        <AppBar position="static">
-          <Toolbar>
-            <IconButton
-              edge="start"
-              className={classes.menuButton}
-              color="inherit"
-              aria-label="menu"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" className={classes.title}>
-              Sapiens
-            </Typography>
-            <FormControl className={classes.theme} variant="standard">
-              <InputLabel>Theme</InputLabel>
-              <Select value={theme} label="Theme" onChange={handleChange}>
-                {themes.map((theme) => {
-                  return <MenuItem key={theme.id} value={theme.id}>{theme.type}</MenuItem>
-                })}
-              </Select>
-            </FormControl>
-          </Toolbar>
-        </AppBar>
+        {isLoading ?
+          <div>Page Loading</div>
+          :
+          <>
+            <Header toggleDark={toggleDark}
+              settoggleDark={setToggleDark} />
+            <StatusCard />
+          </>
+        }
+
       </div>
     </MuiThemeProvider>
   );
